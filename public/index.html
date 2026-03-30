@@ -3,236 +3,224 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Asistente Camper - Soporte al Cliente</title>
+    <title>CamperBot - Dashboard de Monitoreo</title>
     <style>
         :root {
-            --primary-color: #2c3e50;
-            --accent-color: #e67e22;
-            --bg-overlay: rgba(255, 255, 255, 0.85);
-            --text-color: #2c3e50;
+            --primary: #2c3e50;
+            --accent: #e67e22;
+            --success: #27ae60;
+            --warning: #f1c40f;
+            --error: #e74c3c;
+            --bg: #f8f9fa;
         }
 
         body {
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg);
             margin: 0;
+            padding: 20px;
+            color: var(--primary);
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
             display: flex;
-            align-items: flex-start; /* Evita que el tope se bloquee */
-            justify-content: center;
-            background-image: url('/background.jpg?v=1');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
-            min-height: 100vh;
-            padding: 40px 0; /* Padding arriba y abajo para que respire */
-            box-sizing: border-box;
-        }
-
-        .glass-container {
-            max-width: 500px;
-            width: 90%;
-            padding: 30px;
-            background: var(--bg-overlay);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
-            border: 1px solid rgba(255,255,255,0.3);
-            text-align: center;
-            animation: fadeIn 0.8s ease-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        h1 {
-            color: var(--primary-color);
-            font-size: 1.8em;
-            margin: 10px 0;
-            letter-spacing: -0.5px;
-        }
-
-        .description {
-            color: #555;
-            font-size: 0.95em;
-            margin-bottom: 25px;
-        }
-
-        .chat-area {
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 20px;
             background: white;
             border-radius: 15px;
-            overflow: hidden;
-            box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
-            border: 1px solid #eee;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
 
-        #chat-window {
-            height: 400px;
-            overflow-y: auto;
-            padding: 20px;
-            text-align: left;
-            scroll-behavior: smooth;
-        }
-
-        .input-bar {
-            display: flex;
-            padding: 15px;
-            background: #f9f9f9;
-            border-top: 1px solid #eee;
-        }
-
-        #user-input {
-            flex: 1;
-            padding: 12px 15px;
-            border: 1px solid #ddd;
-            border-radius: 25px;
-            outline: none;
-            font-size: 0.95em;
-            transition: all 0.3s;
-        }
-
-        #user-input:focus {
-            border-color: var(--accent-color);
-            box-shadow: 0 0 5px rgba(230, 126, 34, 0.2);
-        }
-
-        button {
-            margin-left: 10px;
-            padding: 10px 25px;
-            background: var(--accent-color);
-            color: white;
-            border: none;
-            border-radius: 25px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s;
-            box-shadow: 0 4px 10px rgba(230, 126, 34, 0.3);
-        }
-
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(230, 126, 34, 0.4);
-        }
-
-        .logo-badge {
-            display: inline-block;
-            padding: 5px 15px;
-            background: var(--accent-color);
-            color: white;
+        .status-badge {
+            padding: 8px 16px;
             border-radius: 20px;
             font-weight: bold;
-            margin-bottom: 15px;
             font-size: 0.9em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .message {
-            margin-bottom: 15px;
-            padding: 10px 15px;
+        .status-connected { background: #e8f5e9; color: var(--success); }
+        .status-waiting { background: #fffde7; color: var(--warning); }
+        .status-disconnected { background: #ffebee; color: var(--error); }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
             border-radius: 15px;
-            max-width: 85%;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        h2 { margin-top: 0; font-size: 1.2em; border-bottom: 2px solid #eee; padding-bottom: 15px; margin-bottom: 20px; }
+
+        #qr-container {
+            text-align: center;
+        }
+
+        #qr-image {
+            max-width: 100%;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            margin-top: 15px;
+        }
+
+        .log-list {
+            height: 500px;
+            overflow-y: auto;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.85em;
+        }
+
+        .log-entry {
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #333;
             line-height: 1.4;
         }
 
-        .asistente { background: #f0f4f8; margin-right: auto; border-bottom-left-radius: 2px; }
-        .tu { background: #fee2d5; margin-left: auto; border-bottom-right-radius: 2px; text-align: right; }
+        .log-ai { color: #569cd6; }
+        .log-user { color: #ce9178; }
+        .log-time { color: #858585; margin-right: 10px; font-size: 0.8em; }
 
-        .video-btn {
-            display: inline-block;
-            margin-top: 10px;
-            padding: 8px 12px;
-            background: #27ae60;
-            color: white !important;
-            text-decoration: none;
-            border-radius: 8px;
-            font-size: 0.85em;
+        .ai-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
             font-weight: bold;
-            transition: background 0.3s;
         }
 
-        .video-btn:hover {
-            background: #2ecc71;
-        }
+        .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+        .dot-active { background: var(--success); }
+        .dot-paused { background: var(--error); }
 
-        .footer {
-            margin-top: 25px;
-            font-size: 0.75em;
-            color: #666;
-            letter-spacing: 0.5px;
+        @media (max-width: 768px) {
+            .grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
 
-    <div class="glass-container">
-        <img src="/logo.jpg?v=1" alt="CamperBot Logo" style="width: 120px; margin-bottom: 20px;">
-        <h1>¿Necesitas ayuda con tu Camper?</h1>
-        <p class="description">Estamos aquí para que tu aventura no se detenga. Pregúntame sobre el gas, la batería o el agua.</p>
-        
-        <div class="chat-area">
-            <div id="chat-window">
-                <div class="message asistente">
-                    <b>Asistente:</b> ¡Hola! ¿En qué puedo ayudarte con tu autocaravana hoy?
+    <div class="container">
+        <header>
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <img src="/logo.jpg" alt="Logo" style="width: 50px; border-radius: 8px;">
+                <h1 style="margin: 0; font-size: 1.5em;">CamperBot <span style="font-weight: 300;">Monitor</span></h1>
+            </div>
+            <div id="status-container" class="status-badge status-disconnected">
+                <span id="status-text">Cargando...</span>
+            </div>
+        </header>
+
+        <div class="grid">
+            <!-- PANEL IZQUIERDO: ESTADO Y QR -->
+            <div class="card">
+                <h2>Estado del Sistema</h2>
+                <div id="ai-indicator" class="ai-status">
+                    <span class="dot dot-active"></span> IA Activa
+                </div>
+                
+                <div id="qr-section" style="display: none; margin-top: 30px;">
+                    <p style="font-size: 0.9em; color: #666;">Escanea este código con WhatsApp para conectar:</p>
+                    <div id="qr-container">
+                        <img id="qr-image" src="/whatsapp-auth.png?t=0" alt="Esperando QR...">
+                    </div>
+                    <button onclick="location.reload()" style="margin-top: 15px; padding: 10px; cursor: pointer;">Recargar QR</button>
+                </div>
+
+                <div id="connected-section" style="display: none; margin-top: 30px; text-align: center;">
+                    <div style="font-size: 3em;">✅</div>
+                    <p>¡El bot está operando!</p>
+                    <p style="font-size: 0.8em; color: #777;">Usa <b>/pausa</b> en WhatsApp para detenerlo temporalmente.</p>
                 </div>
             </div>
-            <div class="input-bar">
-                <input type="text" id="user-input" placeholder="Escribe tu duda aquí..." autocomplete="off">
-                <button onclick="sendMessage()">Enviar</button>
+
+            <!-- PANEL DERECHO: LOGS EN TIEMPO REAL -->
+            <div class="card">
+                <h2>Actividad en Tiempo Real</h2>
+                <div id="log-window" class="log-list">
+                    <div class="log-entry">Iniciando monitor...</div>
+                </div>
             </div>
-        </div>
-
-        <script>
-            const chatWindow = document.getElementById('chat-window');
-            const userInput = document.getElementById('user-input');
-
-            async function sendMessage() {
-                const text = userInput.value.trim();
-                if (!text) return;
-
-                // Mostrar mensaje del usuario
-                appendMessage('Tú', text, 'var(--primary-color)');
-                userInput.value = '';
-
-                try {
-                    const response = await fetch('/api/chat', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ message: text })
-                    });
-                    const data = await response.json();
-                    
-                    // Mostrar respuesta del bot
-                    appendMessage('Asistente', data.response, 'var(--accent-color)');
-                } catch (error) {
-                    appendMessage('Sistema', 'Error al conectar con el asistente.', 'red');
-                }
-            }
-
-            function appendMessage(sender, text, color) {
-                const div = document.createElement('div');
-                const isBot = sender === 'Asistente';
-                div.className = `message ${isBot ? 'asistente' : 'tu'}`;
-                
-                // Procesar links tipo [Texto](URL) y saltos de línea
-                let processedText = text.replace(/\n/g, '<br>');
-                processedText = processedText.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" class="video-btn">$1</a>');
-                
-                div.innerHTML = `<b>${sender}:</b> ${processedText}`;
-                chatWindow.appendChild(div);
-                chatWindow.scrollTop = chatWindow.scrollHeight;
-            }
-
-            // Enviar con Enter
-            userInput.addEventListener('keypress', function (e) {
-                if (e.key === 'Enter') sendMessage();
-            });
-        </script>
-
-        <div class="footer">
-            &copy; 2024 CamperBot Solutions - Impulsando el sector del Caravaning
         </div>
     </div>
 
+    <script>
+        async function updateStatus() {
+            try {
+                const response = await fetch('/api/status');
+                const data = await response.json();
+                
+                const statusContainer = document.getElementById('status-container');
+                const statusText = document.getElementById('status-text');
+                const qrSection = document.getElementById('qr-section');
+                const connectedSection = document.getElementById('connected-section');
+                const aiIndicator = document.getElementById('ai-indicator');
+
+                statusText.innerText = data.status;
+                statusContainer.className = 'status-badge ' + 
+                    (data.status === 'Conectado' ? 'status-connected' : 
+                     (data.status === 'Esperando QR' ? 'status-waiting' : 'status-disconnected'));
+
+                if (data.status === 'Esperando QR') {
+                    qrSection.style.display = 'block';
+                    connectedSection.style.display = 'none';
+                    // Forzar recarga de la imagen QR añadiendo un timestamp
+                    document.getElementById('qr-image').src = '/whatsapp-auth.png?t=' + Date.now();
+                } else if (data.status === 'Conectado') {
+                    qrSection.style.display = 'none';
+                    connectedSection.style.display = 'block';
+                }
+
+                aiIndicator.innerHTML = data.isAIActive ? 
+                    '<span class="dot dot-active"></span> IA Respondiendo' : 
+                    '<span class="dot dot-paused"></span> IA Detenida (Modo Admin)';
+
+            } catch (error) {
+                console.error('Error actualizando estado:', error);
+            }
+        }
+
+        async function updateLogs() {
+            try {
+                const response = await fetch('/api/logs');
+                const logs = await response.json();
+                const logWindow = document.getElementById('log-window');
+                
+                logWindow.innerHTML = logs.map(log => `
+                    <div class="log-entry">
+                        <span class="log-time">[${log.timestamp}]</span>
+                        <span class="log-${log.type}"><b>${log.user}:</b> ${log.message}</span>
+                    </div>
+                `).join('') || '<div class="log-entry">Esperando actividad...</div>';
+            } catch (error) {
+                console.log('Error logs');
+            }
+        }
+
+        // Intervalos de actualización
+        setInterval(updateStatus, 3000);
+        setInterval(updateLogs, 2000);
+        updateStatus();
+        updateLogs();
+    </script>
 </body>
 </html>
